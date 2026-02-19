@@ -1,1 +1,3 @@
-Start
+This text document will detail my progress over time with this project. The overall goal for the project can be laid out in 2 sections:
+
+test
