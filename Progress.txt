@@ -1,3 +1,7 @@
 This text document will detail my progress over time with this project. The overall goal for the project can be laid out in 2 sections:
-
-test
+  1: Get a list of different Hugging Face LLMs designed to identify phishing scams
+  2: Make a custom dataset to test each of the models with
+    - Need to find out what kind of outputs the models give, and determine which to use in the project
+  3: Design an automated test for each model
+    - For the models that have overlapping outputs, compare the outputs and determine which models are best suited for each output
+      (ie)
