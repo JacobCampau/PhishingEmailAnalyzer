@@ -19,4 +19,4 @@ The overall plan for the project can be explained in the following steps:
 
 The goal of this project is to learn how to train a custom small LLM and understand different ways models can generate outputs. The project itself will be used as my CS 491 LLM class final.
 
-<h2>Results</h2>
+<h2>Project Results</h2>
