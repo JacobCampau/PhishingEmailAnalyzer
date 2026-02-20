@@ -1,12 +1,13 @@
 <h2>Project Goals</h2>
 
-This text document will detail my progress over time with this project. The overall goal for the project can be laid out in 2 sections:
+This text document will detail my progress over time with this project. The overall plan for the project can be explained in the following steps:
+
   1. Get a list of different Hugging Face LLMs designed to identify phishing scams<br>
   2. Make a custom dataset to test each of the models with<br>
-    - Need to find out what kind of outputs the models give, and determine which to use in the project<br>
+    - Need to find out what kind of outputs the models give, and determine which to use in the project<br>    
   3. Design an automated test for each model<br>
     - For the models that have overlapping outputs, compare the outputs and determine which models are best suited for each output<br>
-     (i.e. if multiple models have an output detailing urgency indicators in the email, which model produces the most accurate results?)
+     (i.e. if multiple models have an output detailing urgency indicators in the email, which model produces the most accurate results?)   
   4. Program a python script that deoes the following:<br>
     - Take in user input for email details and the email body<br>
     - Pass the email through each model to get each individual output from all models used<br>
