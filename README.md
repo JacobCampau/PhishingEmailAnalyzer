@@ -1,7 +1,7 @@
-# PhishingEmailAnalyzer
+# Phishing Email Analyzer
 <h2>Project Goals</h2>
 
-This text document will detail my progress over time with this project. The overall plan for the project can be explained in the following steps:
+The overall plan for the project can be explained in the following steps:
 
   1. Get a list of different Hugging Face LLMs designed to identify phishing scams<br>
   2. Make a custom dataset to test each of the models with<br>
@@ -18,3 +18,5 @@ This text document will detail my progress over time with this project. The over
     - Using 1 to 3 transformers, train a new model on a separate custom dataset that will output a 0 to 1 score based on the other model's outputs<br>
 
 The goal of this project is to learn how to train a custom small LLM and understand different ways models can generate outputs. The project itself will be used as my CS 491 LLM class final.
+
+<h2>Results</h2>
