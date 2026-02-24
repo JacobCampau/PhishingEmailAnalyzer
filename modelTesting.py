@@ -1,4 +1,5 @@
 import pandas as pd
+import random
 from tqdm import tqdm
 
 def loadEmails(filename):
@@ -9,17 +10,20 @@ def loadEmails(filename):
     chunkSize = 1000
 
     with tqdm(total=rowNum, desc="Importing Emails", unit="Email") as bar:
-        def progress(progress, total):
-            bar.n = progress
-            bar.refresh()
+        for chunk in pd.read_csv(filename, chunksize=chunkSize):
+            records = chunk.to_dict(orient="records")
+            emails.extend(records)
+            bar.update(len(records))
+            
+    return emails
 
 
 def main():
+    emailList = loadEmails("testingEmails.csv")
+    randomEmail = random.choice(emailList)
+    
     print("Testing the models on the following phishing email:")
-
-    email_text = ""
-
-    print(email_text)
+    print(randomEmail)
 
 
 if __name__ == "__main__":
