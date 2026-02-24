@@ -19,7 +19,7 @@ def loadEmails(filename):
 
 
 def main():
-    emailList = loadEmails("testingEmails.csv")
+    emailList = loadEmails("TestingDataset.csv")
     randomEmail = random.choice(emailList)
     
     print("Testing the models on the following phishing email:")
