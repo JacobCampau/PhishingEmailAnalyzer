@@ -13,30 +13,30 @@ model.to(device)
 model.eval()
 
 # Example email for prediction
-email = """Dear user,
+#email = """Dear user,
 
-We detected suspicious activity on your account. Please verify your identity immediately by clicking the link below to avoid suspension.
+#We detected suspicious activity on your account. Please verify your identity immediately by clicking the link below to avoid suspension.
 
-[Phishing Link Here]
+#[Phishing Link Here]
 
-Thank you,
-Security Team"""
+#Thank you,
+#Security Team"""
 
 # Tokenize and prepare the input
-encoded_input = tokenizer(email, return_tensors='pt', truncation=True, padding=True).to(device)
+#encoded_input = tokenizer(email, return_tensors='pt', truncation=True, padding=True).to(device)
 
 # Make prediction
-with torch.no_grad():
-    outputs = model(**encoded_input)
-    probs = torch.nn.functional.softmax(outputs.logits, dim=1)
+#with torch.no_grad():
+#    outputs = model(**encoded_input)
+#    probs = torch.nn.functional.softmax(outputs.logits, dim=1)
 
 # Output prediction
-labels = ["legitimate", "phishing"]
-pred_label = labels[probs.argmax()]
-confidence = probs.max().item()
+#labels = ["legitimate", "phishing"]
+#pred_label = labels[probs.argmax()]
+#confidence = probs.max().item()
 
-print(f"Prediction: {pred_label} ({confidence:.2%} confidence)")
+#print(f"Prediction: {pred_label} ({confidence:.2%} confidence)")
 
-explainer = SequenceClassificationExplainer(model=model, tokenizer=tokenizer)
-word_attributions = explainer(email, class_name="LABEL_0")
-explainer.visualize()
+#explainer = SequenceClassificationExplainer(model=model, tokenizer=tokenizer)
+#word_attributions = explainer(email, class_name="LABEL_0")
+#explainer.visualize()
