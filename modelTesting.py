@@ -3,14 +3,14 @@ import random
 from tqdm import tqdm
 
 def loadEmails(filename):
-    with open(filename, 'r') as file:
-        rowNum = sum(1 for _ in f) - 1 # removed the header
+    df = pd.read_csv(filename)
+    row_num = len(df)
 
     emails = []
-    chunkSize = 1000
+    chunk_size = 1000
 
-    with tqdm(total=rowNum, desc="Importing Emails", unit="Email") as bar:
-        for chunk in pd.read_csv(filename, chunksize=chunkSize):
+    with tqdm(total=row_num, desc="Importing Emails", unit="Email") as bar:
+        for chunk in pd.read_csv(filename, chunksize=chunk_size):
             records = chunk.to_dict(orient="records")
             emails.extend(records)
             bar.update(len(records))
@@ -19,12 +19,18 @@ def loadEmails(filename):
 
 
 def main():
-    emailList = loadEmails("TestingDataset.csv")
-    randomEmail = random.choice(emailList)
+    email_list = loadEmails("TestingDataset.csv")
+    random_email = random.choice(email_list)
     
+    # email being tested
     print("Testing the models on the following phishing email:")
-    print(randomEmail)
+    print(f"Subject: {random_email["subject"]}")
+    print("Body:")
+    print(random_email["body"])
 
+    # outputs
+    print("aamoshdahal outputs:")
+    
 
 if __name__ == "__main__":
     main()

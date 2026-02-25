@@ -1,42 +1,43 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-from transformers_interpret import SequenceClassificationExplainer
 
-# Load the model and tokenizer from Hugging Face Hub
-model_id = "aamoshdahal/email-phishing-distilbert-finetuned"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForSequenceClassification.from_pretrained(model_id)
+# set model id from Hugging Face
+MODEL_ID = "aamoshdahal/email-phishing-distilbert-finetuned"
 
-# Set device (GPU if available)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device)
-model.eval()
+# set the tokenizer and device from the model id
+_tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+_device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
 
-# Example email for prediction
-#email = """Dear user,
+# set-up model
+_model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
+_model.to(device)
+_model.eval()
 
-#We detected suspicious activity on your account. Please verify your identity immediately by clicking the link below to avoid suspension.
+def predict(email: str):
+    # code based off hugging face model page
+    # tokenize input
+    encoded_email = _tokenizer(email, return_tensors = 'pt', truncation = True, padding = True).to(_device)
 
-#[Phishing Link Here]
+    # Make prediction
+    with torch.no_grad():
+        output = model(**encoded_email)
+        probs = torch.nn.functional.softmax(output.logits, dim=1)
 
-#Thank you,
-#Security Team"""
+    # Output prediction
+    labels = ["legitimate", "phishing"]
+    pred_label = labels[probs.argmax()]
+    confidence = probs.max().item()
 
-# Tokenize and prepare the input
-#encoded_input = tokenizer(email, return_tensors='pt', truncation=True, padding=True).to(device)
+    return {
+        "model_id": MODEL_ID,
+        "pred": pred_label
+        "label": label
+        "confidence": confidence,
+        "probs": probs
+    }
 
-# Make prediction
-#with torch.no_grad():
-#    outputs = model(**encoded_input)
-#    probs = torch.nn.functional.softmax(outputs.logits, dim=1)
-
-# Output prediction
-#labels = ["legitimate", "phishing"]
-#pred_label = labels[probs.argmax()]
-#confidence = probs.max().item()
-
-#print(f"Prediction: {pred_label} ({confidence:.2%} confidence)")
-
-#explainer = SequenceClassificationExplainer(model=model, tokenizer=tokenizer)
-#word_attributions = explainer(email, class_name="LABEL_0")
-#explainer.visualize()
+### Left over code from huggin face, DELETE if never used
+# from transformers_interpret import SequenceClassificationExplainer # Used in Hugging Face example code at the bottom of file
+# explainer = SequenceClassificationExplainer(model=model, tokenizer=tokenizer)
+# word_attributions = explainer(email, class_name="LABEL_0")
+# explainer.visualize()
