@@ -1,5 +1,7 @@
 import pandas as pd
+from pprint import pprint
 import random
+import aamoshdahal
 from tqdm import tqdm
 
 def loadEmails(filename):
@@ -29,7 +31,8 @@ def main():
     print(random_email["body"])
 
     # outputs
-    print("aamoshdahal outputs:")
+    print("\naamoshdahal outputs:")
+    pprint(aamoshdahal.predict(random_email["body"]))
     
 
 if __name__ == "__main__":
