@@ -1,8 +1,10 @@
 import pandas as pd
 from pprint import pprint
 import random
-import aamoshdahal
+#import aamoshdahal
+import crabInHoney
 from tqdm import tqdm
+from urlextract import URLExtract
 
 def loadEmails(filename):
     df = pd.read_csv(filename)
@@ -21,6 +23,7 @@ def loadEmails(filename):
 
 
 def main():
+    print
     email_list = loadEmails("TestingDataset.csv")
     random_email = random.choice(email_list)
     
@@ -30,9 +33,17 @@ def main():
     print("Body:")
     print(random_email["body"])
 
-    # outputs
-    print("\naamoshdahal outputs:")
-    pprint(aamoshdahal.predict(random_email["body"]))
+    # outputs aamoshdahal
+    # print("\naamoshdahal outputs:")
+    # pprint(aamoshdahal.predict(random_email["url"]))
+
+    # outputs crabInHoney
+    print("\ncrabInHoney outputs:")
+
+    extractor = URLExtract()
+    urls = extractor.find_urls(random_email["body"])
+
+    pprint(crabInHoney.predict_url(urls))
     
 
 if __name__ == "__main__":

@@ -1,38 +1,44 @@
-# This is code copied directly from the cybersectony homepage found at https://huggingface.co/CrabInHoney/urlbert-tiny-v4-phishing-classifier
-# I am not the original creator of the following code
-
 from transformers import BertTokenizerFast, BertForSequenceClassification, pipeline
 import torch
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"Используемое устройство: {device}")
+# set model id from Hugging Face
+MODEL_ID = "CrabInHoney/urlbert-tiny-v4-phishing-classifier"
 
-model_name = "CrabInHoney/urlbert-tiny-v4-phishing-classifier"
+# set the tokenizer and device from the model id
+_tokenizer = BertTokenizerFast.from_pretrained(MODEL_ID)
+_device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
+_device_num = 0 if torch.cuda.is_available() else -1
 
-tokenizer = BertTokenizerFast.from_pretrained(model_name)
-model = BertForSequenceClassification.from_pretrained(model_name)
-model.to(device)
+# set-up model
+_model = BertForSequenceClassification.from_pretrained(MODEL_ID)
+_model.to(_device)
+_model.eval()
 
-classifier = pipeline(
-    "text-classification",
-    model=model,
-    tokenizer=tokenizer,
-    device=0 if torch.cuda.is_available() else -1,
-    return_all_scores=True
-)
+def predict_url(url: str):
+    # This mode only is used for testing urls
+    encoded_url = _tokenizer(
+        url,
+        return_tensors = 'pt',
+        truncation = True,
+        max_length = 64
+    ).to(_device)
 
-test_urls = [
-    "huggingface.co/",
-    "hu991ngface.com.ru/"
-]
+    with torch.no_grad():
+        output = _model(**encoded_url)
+        probs = torch.nn.functional.softmax(output.logits, dim=1)
 
-label_mapping = {"LABEL_0": "good", "LABEL_1": "fish"}
+    # Output prediction
+    labels = ["legitimate", "phishing"]
+    pred_label = labels[probs.argmax()]
+    confidence = probs.max().item()
 
-for url in test_urls:
-    results = classifier(url)
-    print(f"\nURL: {url}")
-    for result in results[0]: 
-        label = result['label']
-        score = result['score']
-        friendly_label = label_mapping.get(label, label)
-        print(f"Класс: {friendly_label}, вероятность: {score:.4f}")
+    return {
+        # less important, but still accessable
+        "labels": labels,
+        "probs": probs,
+        # important output results
+        "model_id": MODEL_ID,
+        "pred": pred_label,
+        "confidence": confidence,
+        "url": url
+    }

@@ -16,7 +16,12 @@ _model.eval()
 def predict(email: str):
     # code based off hugging face model page
     # tokenize input
-    encoded_email = _tokenizer(email, return_tensors = 'pt', truncation = True, padding = True).to(_device)
+    encoded_email = _tokenizer(
+        email, 
+        return_tensors = 'pt', 
+        truncation = True, 
+        padding = True
+    ).to(_device)
 
     # Make prediction
     with torch.no_grad():
@@ -30,7 +35,7 @@ def predict(email: str):
 
     return {
         # less important, but still accessable
-        "label": labels,
+        "labels": labels,
         "probs": probs,
         # important output results
         "model_id": MODEL_ID,
