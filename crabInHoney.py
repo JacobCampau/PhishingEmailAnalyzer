@@ -20,11 +20,12 @@ def predict_url(url: str):
         url,
         return_tensors = 'pt',
         truncation = True,
+        padding = True,
         max_length = 64
     ).to(device)
 
     with torch.no_grad():
-        output = _model(**encoded_url)
+        output = model(**encoded_url)
         probs = torch.nn.functional.softmax(output.logits, dim=1)
 
     # Output prediction

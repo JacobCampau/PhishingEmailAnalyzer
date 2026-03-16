@@ -37,6 +37,6 @@ def predict(email: str):
         "labels": labels,
         "probs": probs,
         "model_id": MODEL_ID,
-        "pred": pred_label[0],
+        "pred": pred_label,
         "confidence": confidence
     }

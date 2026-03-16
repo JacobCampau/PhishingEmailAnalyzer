@@ -1,11 +1,11 @@
 import pandas as pd
 from pprint import pprint
 import random
-#import aamoshdahal
-# import crabInHoney
-# import elSlay
-# import cybersectony
-# import ealvardob
+import aamoshdahal
+import crabInHoney
+import elSlay
+import cybersectony
+import ealvardob
 from tqdm import tqdm
 from urlextract import URLExtract
 
@@ -37,28 +37,32 @@ def main():
     print(random_email["body"])
 
     # outputs aamoshdahal
-    # print("\naamoshdahal outputs:")
-    # pprint(aamoshdahal.predict(random_email["url"]))
+    print("\naamoshdahal outputs:")
+    pprint(aamoshdahal.predict(random_email["body"]))
 
     # outputs crabInHoney
-    # print("\ncrabInHoney outputs:")
+    print("\n\ncrabInHoney outputs:")
 
-    # extractor = URLExtract()
-    # urls = extractor.find_urls(random_email["body"])
+    extractor = URLExtract()
+    urls = extractor.find_urls(random_email["body"])
 
-    # pprint(crabInHoney.predict_url(urls))
+    # only run if there are url(s)
+    if urls and len(urls) > 0:
+        pprint(crabInHoney.predict_url(urls))
+    else:
+        print("No URLs to examine")
 
     # outputs elSlay
-    # print("\nelSlay outputs:")
-    # pprint(elSlay.predict(random_email["body"]))
+    print("\n\nelSlay outputs:")
+    pprint(elSlay.predict(random_email["body"]))
 
     # outputs ealvardob
-    # print("\nealvardob outputs:")
-    # pprint(ealvardob.predict(random_email["body"]))
+    print("\n\nealvardob outputs:")
+    pprint(ealvardob.predict(random_email["body"]))
 
     # outputs cybersectony
-    # print("\ncybersectony outputs:")
-    # pprint(cybersectony.predict(random_email["body"]))
+    print("\n\ncybersectony outputs:")
+    pprint(cybersectony.predict(random_email["body"]))
     
 
 if __name__ == "__main__":
