@@ -1,31 +1,37 @@
-# This is code copied directly from the cybersectony homepage found at https://huggingface.co/cybersectony/phishing-email-detection-distilbert_v2.4.1
-# I am not the original creator of the following code
-
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-tokenizer = AutoTokenizer.from_pretrained("cybersectony/phishing-email-detection-distilbert_v2.4.1")
 import torch
 
-# Load model and tokenizer
-model = AutoModelForSequenceClassification.from_pretrained("cybersectony/phishing-email-detection-distilbert_v2.4.1")
+# set model id from Hugging Face
+MODEL_ID = "cybersectony/phishing-email-detection-distilbert_v2.4.1"
 
-def predict_email(email_text):
-    # Preprocess and tokenize
-    inputs = tokenizer(
-        email_text,
+# set the tokenizer and device from the model id
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
+
+# set-up model
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
+model.to(device)
+model.eval()
+
+def predict(email: str):
+    # email body and url detection
+    encoded_email = tokenizer(
+        email,
         return_tensors="pt",
         truncation=True,
         max_length=512
-    )
+    ).to(device)
     
-    # Get prediction
+    # make prediction
     with torch.no_grad():
-        outputs = model(**inputs)
+        outputs = model(**encoded_email)
         predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
     
-    # Get probabilities for each class
+    # following differs from other models to better match its hugging face documented code
+    # model probs
     probs = predictions[0].tolist()
     
-    # Create labels dictionary
+    # url and body outputs
     labels = {
         "legitimate_email": probs[0],
         "phishing_url": probs[1],
@@ -33,11 +39,14 @@ def predict_email(email_text):
         "phishing_url_alt": probs[3]
     }
     
-    # Determine the most likely classification
-    max_label = max(labels.items(), key=lambda x: x[1])
-    
+    # results
+    pred_label = max(labels.items(), key=lambda x: x[1])
+    confidence = predictions.max().item()
+
     return {
-        "prediction": max_label[0],
-        "confidence": max_label[1],
-        "all_probabilities": labels
+        "labels": labels,
+        "probs": probs,
+        "model_id": MODEL_ID,
+        "pred": pred_label[0],
+        "confidence": confidence
     }

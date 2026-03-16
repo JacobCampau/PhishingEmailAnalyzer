@@ -5,23 +5,23 @@ import torch
 MODEL_ID = "CrabInHoney/urlbert-tiny-v4-phishing-classifier"
 
 # set the tokenizer and device from the model id
-_tokenizer = BertTokenizerFast.from_pretrained(MODEL_ID)
-_device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
-_device_num = 0 if torch.cuda.is_available() else -1
+tokenizer = BertTokenizerFast.from_pretrained(MODEL_ID)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
+device_num = 0 if torch.cuda.is_available() else -1
 
 # set-up model
-_model = BertForSequenceClassification.from_pretrained(MODEL_ID)
-_model.to(_device)
-_model.eval()
+model = BertForSequenceClassification.from_pretrained(MODEL_ID)
+model.to(device)
+model.eval()
 
 def predict_url(url: str):
     # This mode only is used for testing urls
-    encoded_url = _tokenizer(
+    encoded_url = tokenizer(
         url,
         return_tensors = 'pt',
         truncation = True,
         max_length = 64
-    ).to(_device)
+    ).to(device)
 
     with torch.no_grad():
         output = _model(**encoded_url)
