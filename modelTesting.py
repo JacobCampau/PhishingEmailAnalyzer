@@ -3,7 +3,6 @@ from pprint import pprint
 import random
 import aamoshdahal
 import crabInHoney
-import elSlay
 import cybersectony
 import ealvardob
 from tqdm import tqdm
@@ -26,7 +25,6 @@ def loadEmails(filename):
 
 
 def main():
-    print
     email_list = loadEmails("TestingDataset.csv")
     random_email = random.choice(email_list)
     
@@ -38,7 +36,13 @@ def main():
 
     # outputs aamoshdahal
     print("\naamoshdahal outputs:")
-    pprint(aamoshdahal.predict(random_email["body"]))
+    body_outputs_1 = aamoshdahal.predict(random_email["body"])
+    pprint(body_outputs_1)
+
+    # outputs ealvardob
+    print("\n\nealvardob outputs:")
+    body_outputs_2 = ealvardob.predict(random_email["body"])
+    pprint(body_outputs_2)
 
     # outputs crabInHoney
     print("\n\ncrabInHoney outputs:")
@@ -46,24 +50,19 @@ def main():
     extractor = URLExtract()
     urls = extractor.find_urls(random_email["body"])
 
+    url_outputs = None
     # only run if there are url(s)
     if urls and len(urls) > 0:
-        pprint(crabInHoney.predict_url(urls))
+        url_outputs = crabInHoney.predict_url(urls)
+        pprint(url_outputs)
     else:
         print("No URLs to examine")
 
-    # outputs elSlay
-    print("\n\nelSlay outputs:")
-    pprint(elSlay.predict(random_email["body"]))
-
-    # outputs ealvardob
-    print("\n\nealvardob outputs:")
-    pprint(ealvardob.predict(random_email["body"]))
-
     # outputs cybersectony
     print("\n\ncybersectony outputs:")
-    pprint(cybersectony.predict(random_email["body"]))
-    
+    url_body_outputs = cybersectony.predict(random_email["body"])
+    pprint(url_body_outputs)
+
 
 if __name__ == "__main__":
     main()
