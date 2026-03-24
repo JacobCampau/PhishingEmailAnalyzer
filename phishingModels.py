@@ -1,12 +1,15 @@
 import pandas as pd
 from pprint import pprint
 import random
+from tqdm import tqdm
+from urlextract import URLExtract
+import os
+
+
 import aamoshdahal
 import crabInHoney
 import cybersectony
 import ealvardob
-from tqdm import tqdm
-from urlextract import URLExtract
 
 def loadEmails(filename):
     df = pd.read_csv(filename)
@@ -25,32 +28,37 @@ def loadEmails(filename):
 
 def main():
     print("Let's Go Phishing Main Page\nLoading Emails...")
-    email_list = loadEmails("TestingDataset.csv")
+    # email_list = loadEmails("TestingDataset.csv")
+    # random_email = random.choice(email_list)
 
-    random_email = random.choice(email_list)
+    chosen_email = None
+    with open("perfect_email.txt", 'r') as file:
+        chosen_email = file.read()
 
     print("Gen Outputs:")
-     # email being tested
+    # email being tested
     print("Testing the models on the following phishing email:")
-    print(f"Subject: {random_email["subject"]}")
+    # print(f"Subject: {random_email["subject"]}")
+    print("Subject: CNN.com Daily Top 10")
     print("Body:")
-    print(random_email["body"])
+    # print(random_email["body"])
+    print(chosen_email)
 
     # outputs aamoshdahal
     print("\naamoshdahal outputs:")
-    body_outputs_1 = aamoshdahal.predict(random_email["body"])
+    body_outputs_1 = aamoshdahal.predict(chosen_email)
     pprint(body_outputs_1)
 
     # outputs ealvardob
     print("\n\nealvardob outputs:")
-    body_outputs_2 = ealvardob.predict(random_email["body"])
+    body_outputs_2 = ealvardob.predict(chosen_email)
     pprint(body_outputs_2)
 
     # outputs crabInHoney
     print("\n\ncrabInHoney outputs:")
 
     extractor = URLExtract()
-    urls = extractor.find_urls(random_email["body"])
+    urls = extractor.find_urls(chosen_email)
 
     url_outputs = None
     # only run if there are url(s)
@@ -62,10 +70,55 @@ def main():
 
     # outputs cybersectony
     print("\n\ncybersectony outputs:")
-    url_body_outputs = cybersectony.predict(random_email["body"])
+    url_body_outputs = cybersectony.predict(chosen_email)
     pprint(url_body_outputs)
 
-    # 
+    # disagreement detection
+    confidence_array = [body_outputs_1, body_outputs_2, url_outputs, url_body_outputs]
+    disagreement_scores = findDisagreement(confidence_array)
+    if disagreement_scores[0] > 0 or disagreement_scores[1] > 0:
+        print("\n\nDisagreement Found")
+
+    # Disagreement analysis with gpt
+    print("test prompt")
+    prompt = f"""
+    There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam.
+    
+    The first model is an email body analyzer called aamoshdahal and gave the following results: {body_outputs_1}
+    The second model is an email body analyzer called ealvardob and gave the following results: {body_outputs_2}
+    The third model is an url analyzer called crabInHoney and gave the following results: {url_outputs}
+    The fourth model is an email body and url analyzer and gave the following results: {url_body_outputs}
+    
+    From these models, {disagreement_scores[0]} of them disagreed based on a 10% confidence disagreement and {disagreement_scores[1]} of them disagreed based on their pred label.
+    
+    Using this information, give me an explination for why this disagreement has occured.
+    """
+    print(prompt)
+
+
+def findDisagreement(confidence_array):
+    confidence_score = 0
+    label_score = 0
+    
+    for i in range(len(confidence_array)):
+        for j in range(i+1, len(confidence_array)):
+            model_1 = confidence_array[i]
+            model_2 = confidence_array[j]
+
+            if abs(model_1["confidence"] - model_2["confidence"]) > 0.1:
+                confidence_score += 1
+
+            if "cybersectony" in model_1["model_id"]:
+                match = model_2["pred"] in model_1["pred"]
+            elif "cybersectony" in model_2["model_id"]:
+                match = model_1["pred"] in model_2["pred"]
+            else:
+                match = model_1["pred"] == model_2["pred"]
+
+            if not match:
+                label_score += 1
+
+    return confidence_score, label_score
 
 if __name__ == "__main__":
     main()
