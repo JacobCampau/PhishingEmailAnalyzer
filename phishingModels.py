@@ -91,7 +91,7 @@ def main():
     
     From these models, {disagreement_scores[0]} of them disagreed based on a 10% confidence disagreement and {disagreement_scores[1]} of them disagreed based on their pred label.
     
-    Using this information, give me an explination for why this disagreement has occured.
+    Using only this information, give me an explination for why this disagreement has occured.
     """
     print(prompt)
 
@@ -101,22 +101,41 @@ def findDisagreement(confidence_array):
     label_score = 0
     
     for i in range(len(confidence_array)):
+        model_1 = confidence_array[i]
+        label_disagreement = False
+        confidence_disagreement = False
+
         for j in range(i+1, len(confidence_array)):
-            model_1 = confidence_array[i]
+            if i == j:
+                continue
+
             model_2 = confidence_array[j]
 
-            if abs(model_1["confidence"] - model_2["confidence"]) > 0.1:
-                confidence_score += 1
+            # Early check
+            if confidence_disagreement and label_disagreement:
+                break
 
-            if "cybersectony" in model_1["model_id"]:
-                match = model_2["pred"] in model_1["pred"]
-            elif "cybersectony" in model_2["model_id"]:
-                match = model_1["pred"] in model_2["pred"]
-            else:
-                match = model_1["pred"] == model_2["pred"]
+            # Confidence Check
+            if not confidence_disagreement:
+                if abs(model_1["confidence"] - model_2["confidence"]) > 0.1:
+                    confidence_disagreement = True
 
-            if not match:
-                label_score += 1
+            # Label Check
+            if not label_disagreement:
+                if "cybersectony" in model_1["model_id"]:
+                    match = model_2["pred"] in model_1["pred"]
+                elif "cybersectony" in model_2["model_id"]:
+                    match = model_1["pred"] in model_2["pred"]
+                else:
+                    match = model_1["pred"] == model_2["pred"]
+
+                if not match:
+                    label_disagreement = True
+        
+        if confidence_disagreement:
+            confidence_score += 1
+        if label_disagreement:
+            label_score += 1
 
     return confidence_score, label_score
 
