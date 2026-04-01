@@ -1,15 +1,23 @@
-from transformers import BertForSequenceClassification, BertTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+import os
+
+# Get the locally saved model file path
+from pathlib import Path
+MODEL_PATH = Path(__file__).resolve().parent / "models" / "ealvaradob"
+
+# # get the hf token from the environment
+# HF_TOKEN = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 # set model id from Hugging Face
-MODEL_ID = "ElSlay/BERT-Phishing-Email-Model"
+MODEL_ID = "ealvaradob/bert-finetuned-phishing"
 
 # set the tokenizer and device from the model id
-tokenizer = BertTokenizer.from_pretrained(MODEL_ID)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
 
 # set-up model
-model = BertForSequenceClassification.from_pretrained(MODEL_ID)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, local_files_only=True)
 model.to(device)
 model.eval()
 
@@ -19,8 +27,7 @@ def predict(email: str):
         email,
         return_tensors = "pt",
         truncation = True,
-        padding = 'max_length',
-        max_length = 512
+        padding = True
     ).to(device)
     
     # make prediction
