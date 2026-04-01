@@ -104,13 +104,22 @@ def main():
         
         Keep the response minimal while giving a detailed explination that a high schooler could understand. Minimal header and indentation. The answer should be structured with these categories: "Body analysis differences", "URL analysis differences", and a final "Overall" section. Do not add any '#' or '*' to the headers. Refer to the models by their name.
         
-        Finally, on its own line, give your own prediction on how likely the email is a scam by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
+        Finally, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs and your analysis of their disagreements, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
         """
 
         response = gptMini.get_analysis(prompt)
 
         print("Analysis of disagreement(s):\n")
         print(response)
+
+        # scraping the final conclusion value from the analysis prediction.
+        gpt_prediction = float(response.strip().split()[-1])
+        if gpt_prediction > 0.6:
+            print("\nThis email is likely a scam.")
+        elif gpt_prediction < 0.4:
+            print("\nThis email is likely not a scam")
+        else:
+            print("\nIt is hard to say for sure if this email is a scam. Proceed with caution.")
 
 
 def findDisagreement(confidence_array):
