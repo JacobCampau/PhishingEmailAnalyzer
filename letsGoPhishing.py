@@ -51,7 +51,7 @@ def main():
     # outputs aamoshdahal
     print("\n\naamoshdahal outputs:")
     body_outputs_1 = aamoshdahal.predict(chosen_email)
-    print(f"Prediction {body_outputs_1["pred"]}. Confidence is: {body_outputs_1["confidence"]}")
+    print(f"Prediction: {body_outputs_1["pred"]}. Confidence is: {body_outputs_1["confidence"]}")
     # pprint(body_outputs_1)
 
     # outputs ealvardob
@@ -103,6 +103,8 @@ def main():
         Using specific reasons from the email being analyzed in this prompt, give me an explination for why this disagreement has occured. 
         
         Keep the response minimal while giving a detailed explination that a high schooler could understand. Minimal header and indentation. The answer should be structured with these categories: "Body analysis differences", "URL analysis differences", and a final "Overall" section. Do not add any '#' or '*' to the headers. Refer to the models by their name.
+        
+        Finally, on its own line, give your own prediction on how likely the email is a scam by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
         """
 
         response = gptMini.get_analysis(prompt)
