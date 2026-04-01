@@ -85,10 +85,11 @@ def main():
     confidence_array = [body_outputs_1, body_outputs_2, url_outputs, url_body_outputs]
     disagreement_scores = findDisagreement(confidence_array)
     if disagreement_scores[0] > 0 or disagreement_scores[1] > 0:
+        # there was a disagreement
         print("\n\nDisagreement Found!!\n\n")
 
-        # Disagreement analysis with gpt
-        prompt = f"""
+        # disagreement analysis with gpt
+        dis_prompt = f"""
         There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam. In the following email contained within quotation marks: 
         
         "{chosen_email}"
@@ -104,10 +105,10 @@ def main():
         
         Keep the response minimal while giving a detailed explination that a high schooler could understand. Minimal header and indentation. The answer should be structured with these categories: "Body analysis differences", "URL analysis differences", and a final "Overall" section. Do not add any '#' or '*' to the headers. Refer to the models by their name.
         
-        Finally, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs and your analysis of their disagreements, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
+        Finally, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs and the analysis you just gave of their disagreements, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
         """
 
-        response = gptMini.get_analysis(prompt)
+        response = gptMini.get_analysis(dis_prompt)
 
         print("Analysis of disagreement(s):\n")
         print(response)
@@ -120,6 +121,18 @@ def main():
             print("\nThis email is likely not a scam")
         else:
             print("\nIt is hard to say for sure if this email is a scam. Proceed with caution.")
+    else:
+        # there was no disagreement
+        print("\n\nNo disagreement found\n\n")
+
+        # using gpt to get a value based on the model outputs
+        agree_prompt = f"""
+        Using this email contained within quotation marks: "{chosen_email}" I passed this email through four phishing scam analyzers
+        The first is aamoshdahal, which looked at the email body and had the results {body_outputs_1}
+        The second was ealvaradob, which looked at the email body and had the results {body_outputs_2}
+        The third was crabInHoney, which looked at the urls in the email had the results {url_outputs}
+        The fourth was cybersectony, which looked at the urls and email body had the results {url_body_outputs}
+        """
 
 
 def findDisagreement(confidence_array):
