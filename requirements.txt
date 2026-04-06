@@ -1,0 +1,7 @@
+pandas
+tqdm
+urlextract
+transformers
+torch
+openai
+python-dotenv

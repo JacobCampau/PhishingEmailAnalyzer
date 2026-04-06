@@ -33,30 +33,31 @@ def loadEmails(filename):
 
 def main():
     print("Let's Go Phishing Main Page\nLoading Emails...")
-    # email_list = loadEmails("TestingDataset.csv")
+    email_list = loadEmails("TestingDataset.csv")
     # random_email = random.choice(email_list)
+    chosen_email = random.choice(email_list)
 
-    chosen_email = None
-    with open("perfect_email.txt", 'r') as file:
-        chosen_email = file.read()
+    # chosen_email = None
+    # with open("perfect_email.txt", 'r') as file:
+    #     chosen_email = file.read()
 
     # email being tested
     print("Testing the models on the following phishing email:")
-    # print(f"Subject: {random_email["subject"]}")
-    print("Subject: CNN.com Daily Top 10")
+    print(f"Subject: {chosen_email["subject"]}")
+    # print("Subject: CNN.com Daily Top 10")
     print("Body:")
-    # print(random_email["body"])
-    print(chosen_email)
+    print(chosen_email["body"])
+    # print(chosen_email)
 
     # outputs aamoshdahal
     print("\n\naamoshdahal outputs:")
-    body_outputs_1 = aamoshdahal.predict(chosen_email)
+    body_outputs_1 = aamoshdahal.predict(chosen_email["body"])
     print(f"Prediction: {body_outputs_1["pred"]}. Confidence is: {body_outputs_1["confidence"]}")
     # pprint(body_outputs_1)
 
     # outputs ealvardob
-    print("\nealvardob outputs:")
-    body_outputs_2 = ealvaradob.predict(chosen_email)
+    print("\nealvaradob outputs:")
+    body_outputs_2 = ealvaradob.predict(chosen_email["body"])
     print(f"Prediction: {body_outputs_2["pred"]}. Confidence is: {body_outputs_2["confidence"]}")
     # pprint(body_outputs_2)
 
@@ -64,7 +65,7 @@ def main():
     print("\ncrabInHoney outputs:")
 
     extractor = URLExtract()
-    urls = extractor.find_urls(chosen_email)
+    urls = extractor.find_urls(chosen_email["body"])
 
     url_outputs = None
     # only run if there are url(s)
@@ -77,7 +78,7 @@ def main():
 
     # outputs cybersectony
     print("\ncybersectony outputs:")
-    url_body_outputs = cybersectony.predict(chosen_email)
+    url_body_outputs = cybersectony.predict(chosen_email["body"])
     print(f"Prediction: {url_body_outputs["pred"]}. Confidence is: {url_body_outputs["confidence"]}")
     # pprint(url_body_outputs)
 
@@ -92,7 +93,7 @@ def main():
         dis_prompt = f"""
         There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam. In the following email contained within quotation marks: 
         
-        "{chosen_email}"
+        "{chosen_email["body"]}"
         
         The first model is an email body analyzer called aamoshdahal and gave the following results: {body_outputs_1}
         The second model is an email body analyzer called ealvaradob and gave the following results: {body_outputs_2}
@@ -111,28 +112,33 @@ def main():
         response = gptMini.get_analysis(dis_prompt)
 
         print("Analysis of disagreement(s):\n")
-        print(response)
-
-        # scraping the final conclusion value from the analysis prediction.
-        gpt_prediction = float(response.strip().split()[-1])
-        if gpt_prediction > 0.6:
-            print("\nThis email is likely a scam.")
-        elif gpt_prediction < 0.4:
-            print("\nThis email is likely not a scam")
-        else:
-            print("\nIt is hard to say for sure if this email is a scam. Proceed with caution.")
     else:
         # there was no disagreement
         print("\n\nNo disagreement found\n\n")
 
         # using gpt to get a value based on the model outputs
         agree_prompt = f"""
-        Using this email contained within quotation marks: "{chosen_email}" I passed this email through four phishing scam analyzers
+        Using this email contained within quotation marks: "{chosen_email["body"]}" I passed this email through four phishing scam analyzers
         The first is aamoshdahal, which looked at the email body and had the results {body_outputs_1}
         The second was ealvaradob, which looked at the email body and had the results {body_outputs_2}
         The third was crabInHoney, which looked at the urls in the email had the results {url_outputs}
         The fourth was cybersectony, which looked at the urls and email body had the results {url_body_outputs}
+
+        For your response, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
         """
+
+        response = gptMini.get_analysis(agree_prompt)
+
+    print(response)
+
+    # scraping the final conclusion value from the analysis prediction.
+    gpt_prediction = float(response.strip().split()[-1])
+    if gpt_prediction > 0.6:
+        print("\nThis email is likely a scam.")
+    elif gpt_prediction < 0.4:
+        print("\nThis email is likely not a scam")
+    else:
+        print("\nIt is hard to say for sure if this email is a scam. Proceed with caution.")
 
 
 def findDisagreement(confidence_array):
