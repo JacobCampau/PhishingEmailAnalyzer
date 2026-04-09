@@ -19,20 +19,38 @@ import ealvaradob
 def main():
     print("Let's Go Phishing Main Page\nLoading Emails...")
     email_list = loadEmails("TestingDataset.csv")
-    chosen_email = random.choice(email_list)
+    chosen_email = random.choice(emails)
 
-    # email being tested
-    print("Testing the models on the following phishing email:")
-    print(f"Subject: {chosen_email["subject"]}")
-    print("Body:")
-    print(chosen_email["body"])
+    # counts
+    num_guesses = 0
+    num_right = 0
+    num_false_negative = 0
+    num_false_positive = 0
+    
+    # tests
+    for _ in range(5):
+        check_results = runCheck(chosen_email)
+        num_guesses += 1
+        
+        print(f"Score: {check_results[1]}. Scam Point: {check_results[2]}. Email Score: {check_results[3]}")
+        
+        if check_results[2] == check_results[3]:
+            # correct guess
+            num_right += 1
+        elif check_results[2] == 0:
+            # guessed no scam but it was
+            num_false_negative += 1
+        else:
+            # guessed scam but it was not
+            num_false_positive += 1
 
-    check_results = runCheck(chosen_email)
+    # percents
+    percent_correct = num_right / num_guesses
+    percent_fp = num_false_positive / num_guesses
+    percent_fn = num_false_negative / num_guesses
 
-    print("Analysis:\n")
-    print(check_results[0])
-    print(f"Final call on if scam: {check_results[2]}")
-    print(f"Disagreement scores: {check_results[4]}")
+    print(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}\n")
+
 
 def loadEmails(filename):
     df = pd.read_csv(filename)
