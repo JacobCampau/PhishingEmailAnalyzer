@@ -1,0 +1,24 @@
+Test results based off first 5 emails
+
+Score: 0.95. Scam Point: 1. Email Score: 1
+Score: 0.98. Scam Point: 1. Email Score: 1
+Score: 0.3. Scam Point: 0. Email Score: 1
+Score: 0.3. Scam Point: 0. Email Score: 0
+Score: 1.0. Scam Point: 1. Email Score: 1
+
+=== RESULTS ===
+Percent guessed right: 0.8
+Percent false positive: 0.0
+Percent false negative: 0.2
+Test results based off first 5 emails
+
+Score: 0.99. Scam Point: 1. Email Score: 1
+Score: 0.99. Scam Point: 1. Email Score: 1
+Score: 0.25. Scam Point: 0. Email Score: 1
+Score: 0.2. Scam Point: 0. Email Score: 0
+Score: 1.0. Scam Point: 1. Email Score: 1
+
+=== RESULTS ===
+Percent guessed right: 0.8
+Percent false positive: 0.0
+Percent false negative: 0.2

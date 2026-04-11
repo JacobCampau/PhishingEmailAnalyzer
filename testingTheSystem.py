@@ -3,6 +3,8 @@ from pprint import pprint
 import random
 from tqdm import tqdm
 from urlextract import URLExtract
+import re
+import os
 
 # Load my local environment variables for tokens
 from dotenv import load_dotenv
@@ -19,21 +21,29 @@ import ealvaradob
 def main():
     print("Let's Go Phishing Main Page\nLoading Emails...")
     email_list = loadEmails("TestingDataset.csv")
-    chosen_email = random.choice(emails)
+    filename = "systemTest_1000"
+    emailRange = 1000
 
-    # counts
+    with open(filename, 'a') as file:
+            file.write(f"Test results based off first {emailRange} emails\n\n")
+
+    # counts for system
     num_guesses = 0
     num_right = 0
     num_false_negative = 0
     num_false_positive = 0
-    
+
     # tests
-    for _ in range(5):
-        check_results = runCheck(chosen_email)
+    for i in range(emailRange):
+        # chosen_email = random.choice(email_list)
+        check_results = runCheck(email_list[i])
         num_guesses += 1
         
+        # checking the system to the actual
         print(f"Score: {check_results[1]}. Scam Point: {check_results[2]}. Email Score: {check_results[3]}")
-        
+        with open(filename, 'a') as file:
+            file.write(f"Score: {check_results[1]}. Scam Point: {check_results[2]}. Email Score: {check_results[3]}\n")
+
         if check_results[2] == check_results[3]:
             # correct guess
             num_right += 1
@@ -51,6 +61,8 @@ def main():
 
     print(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}\n")
 
+    with open(filename, 'a') as file:
+            file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}\n")
 
 def loadEmails(filename):
     df = pd.read_csv(filename)
@@ -94,12 +106,12 @@ def runCheck(email):
             url_outputs = max(all_url_outputs, key=lambda x: x["confidence"])
 
     # disagreement detection
-    confidence_array = [body_outputs_1, body_outputs_2, url_body_outputs]
+    results_array = [body_outputs_1, body_outputs_2, url_body_outputs]
     if urls and len(urls) > 0:
         # add the url stuff if there are urls
-        confidence_array.append(url_outputs)
+        results_array.append(url_outputs)
         
-    disagreement_scores = findDisagreement(confidence_array)
+    disagreement_scores = findDisagreement(results_array)
 
     # get gpt response and analysis
     scam_results = getAnalysis(email["body"], disagreement_scores, body_outputs_1, body_outputs_2, url_outputs, url_body_outputs)
