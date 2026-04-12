@@ -17,9 +17,9 @@ import cybersectony
 import ealvaradob
 
 def main():
-    print("Let's Go Phishing Main Page\nLoading Emails...")
+    print("Let's Go Phishing Main Page\n")
     email_list = loadEmails("TestingDataset.csv")
-    chosen_email = random.choice(email_list)
+    chosen_email = email_list[2] # this email produced great disagreement scores each time it ran
 
     # email being tested
     print("Testing the models on the following phishing email:")
@@ -31,9 +31,10 @@ def main():
 
     print("Analysis:\n")
     print(check_results[0])
-    print(f"Final call on if scam: {check_results[2]}")
+    print(f"Final determination for chance of scam: {check_results[2]}")
     print(f"Disagreement scores: {check_results[4]}")
 
+# Loading the actual email list
 def loadEmails(filename):
     df = pd.read_csv(filename)
     row_num = len(df)
@@ -49,6 +50,7 @@ def loadEmails(filename):
             
     return emails
 
+### System Functions
 def runCheck(email):
     body_outputs_1 = aamoshdahal.predict(email["body"])
     body_outputs_2 = ealvaradob.predict(email["body"])
@@ -76,15 +78,15 @@ def runCheck(email):
             url_outputs = max(all_url_outputs, key=lambda x: x["confidence"])
 
     # disagreement detection
-    confidence_array = [body_outputs_1, body_outputs_2, url_body_outputs]
+    model_array = [body_outputs_1, body_outputs_2, url_body_outputs]
     if urls and len(urls) > 0:
         # add the url stuff if there are urls
-        confidence_array.append(url_outputs)
+        model_array.append(url_outputs)
         
-    disagreement_scores = findDisagreement(confidence_array)
+    disagreement_scores = findDisagreement(model_array)
 
     # get gpt response and analysis
-    scam_results = getAnalysis(email["body"], disagreement_scores, body_outputs_1, body_outputs_2, url_outputs, url_body_outputs)
+    scam_results = getAnalysis(email["body"], disagreement_scores, model_array)
     scam_point = None
 
     if scam_results[1] > 0.6:
@@ -99,46 +101,19 @@ def runCheck(email):
 
     return scam_results[0], scam_results[1], scam_point, email["label"], disagreement_scores
 
-def getAnalysis(email, dis_scores, b_output_1, b_output_2, u_output, b_u_output):
+def getAnalysis(email, dis_scores, model_outputs):
     response = None
+    prompt = None
 
     if dis_scores[0] > 0 or dis_scores[1] > 0:
         # there was a disagreement
-        # disagreement analysis with gpt
-        dis_prompt = f"""
-        There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam. In the following email contained within quotation marks: 
-        
-        "{email}"
-        
-        The first model is an email body analyzer called aamoshdahal and gave the following results: {b_output_1}
-        The second model is an email body analyzer called ealvaradob and gave the following results: {b_output_2}
-        The third model is an url analyzer called crabInHoney and gave the following results: {u_output}
-        The fourth model is an email body and url analyzer and gave the following results: {b_u_output}
-        
-        From these models, {dis_scores[0]} of them disagreed based on a 10% confidence disagreement and {dis_scores[1]} of them disagreed based on their pred label.
-        
-        Using specific reasons from the email being analyzed in this prompt, give me an explination for why this disagreement has occured. 
-        
-        Keep the response minimal while giving a detailed explination that a high schooler could understand. Minimal header and indentation. The answer should be structured with these categories: "Body analysis differences", "URL analysis differences", and a final "Overall" section. Do not add any '#' or '*' to the headers. Refer to the models by their name.
-        
-        Finally, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs and the analysis you just gave of their disagreements, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
-        """
-
-        response = gptMini.get_analysis(dis_prompt)
+        prompt = makeDisagreementPrompt(email, model_outputs, dis_scores)
     else:
         # there was no disagreement
-        # using gpt to get a value based on the model outputs
-        agree_prompt = f"""
-        Using this email contained within quotation marks: "{email}" I passed this email through four phishing scam analyzers
-        The first is aamoshdahal, which looked at the email body and had the results {b_output_1}
-        The second was ealvaradob, which looked at the email body and had the results {b_output_2}
-        The third was crabInHoney, which looked at the urls in the email had the results {u_output}
-        The fourth was cybersectony, which looked at the urls and email body had the results {b_u_output}
-
-        For your response, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
-        """
-
-        response = gptMini.get_analysis(agree_prompt)
+        prompt = makeAgreementPrompt(email, model_outputs)
+    
+    # get the gpt response
+    response = gptMini.get_analysis(prompt)
 
     # scraping the final conclusion value from the analysis prediction.
     gpt_prediction = float(response.strip().split()[-1])
@@ -188,5 +163,74 @@ def findDisagreement(confidence_array):
 
     return confidence_score, label_score
 
+### Prompt Creations
+def makeDisagreementPrompt(email_body, m_array, d_scores):
+    url_results = "No urls were extracted"
+    if len(m_array) > 3:
+        url_results = m_array[3]
+    
+    prompt = f"""
+    There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam.
+    
+    Email: \"{email_body}\"
+    
+    Model Outputs:
+    - aamoshdahal (body analysis): {m_array[0]}
+    - ealvardob (body analysis): {m_array[1]}
+    - cybersectony (body and url analysis): {m_array[2]}
+    - crabInHoney (url analysis): {url_results}
+    
+    Disagreement scores:
+    - confidence disagreement count (10% difference in confidence percent): {d_scores[0]}
+    - label disagreement count (number of models who disagreed based on their label): {d_scores[1]}
+
+    Using specific reasons from the email and the disagreement score, give an explination for why the disagreement occured. 
+    
+    Output requirements:
+    - No special characters
+    - Keep the response concise but still clear and useful
+    - Refer to the models by their exact names
+    - Do not invent evidence that is not present in the email, model outputs, or disagreement scores
+    - Put all explanation before the final line
+
+    On the final line, print a scam probability score on the last line.
+
+    Probability score requirements:
+    - Output exactly 1 line.
+    - That line must be a number between 0 and 1.
+    - It should reflect the probability this email is a scam (0 is no scam, 1 is a scam).
+    - The probability must be based on the the model outputs.
+    - It must be the last number that appears anywhere in the response.
+    - Do not print any words, labels, punctuation, or extra lines after it.
+    """
+
+    return prompt
+
+def makeAgreementPrompt(email_body, m_array):
+    url_results = "No urls were extracted"
+    if len(m_array) > 3:
+        url_results = m_array[3]
+
+    prompt = f"""
+    Using this email and ai model outputs bellow, determine how likely the email is a phishing scam
+    
+    Email: \"{email_body}\"
+
+    Model Outputs:
+    - aamoshdahal (body analysis): {m_array[0]}
+    - ealvardob (body analysis): {m_array[1]}
+    - cybersectony (body and url analysis): {m_array[2]}
+    - crabInHoney (url analysis): {url_results}
+
+    Output requirements:
+    - Output exactly 1 line.
+    - That line must be a number between 0 and 1.
+    - It should reflect the probability this email is a scam (0 is no scam, 1 is a scam).
+    - The probability must be based on and agree with, the model outputs.
+    """
+    
+    return prompt
+
+### Run main on start
 if __name__ == "__main__":
     main()

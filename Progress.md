@@ -36,3 +36,97 @@ Separated the main function into multiple functions to help with modularity and 
 
 <h3>04/11/2026</h3>
 Ran the first tests for the system. On a sample of 500 emails it performed with 65% correct answers, way under performing. It also had 11% false negatives and 24% false positives when guessing an email was a scam. This is not good. I need to reign in the prompt engineering better. May need to redo the prompt completely to get it done. Once I can get this value up, I will test the other models and make a simple UI. Will likely need to stick to a CLI so I dont need to waste too much time on that and can focus on making the system more accurate.
+
+<h3>04/11/2026</h3>
+Changing the prompts to be more concise. Looking back on them, I am still treating the gpt model as a human with the way I am giving it directions. For example, the original aggreement response looked like this:
+
+<br>f"""
+Using this email contained within quotation marks: "{email}" I passed this email through four phishing scam analyzers
+The first is aamoshdahal, which looked at the email body and had the results {b_output_1}
+The second was ealvaradob, which looked at the email body and had the results {b_output_2}
+The third was crabInHoney, which looked at the urls in the email had the results {u_output}
+The fourth was cybersectony, which looked at the urls and email body had the results {b_u_output}
+
+For your response, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
+"""
+
+<br>It has now been updated to look like:
+
+<br>f"""
+Using this email and ai model outputs bellow, determine how likely the email is a phishing scam
+
+Email: \"{email_body}\"
+
+Model Outputs:
+- aamoshdahal (body analysis): {model_array[0]}
+- ealvardob (body analysis): {model_array[1]}
+- crabInHoney (url analysis): {model_array[2]}
+- cybersectony (body and url analysis): {model_array[3]}
+
+Output exactly 1 line.
+That line must be a number between 0 and 1.
+It should reflect the probability this email is a scam (0 is no scam, 1 is a scam).
+The probability must be based on and agree with, the model outputs.
+"""
+
+<br>And it has been placed in its own function to help simplify the look of the getAnalysis function.
+
+<br>The disagreement analysis was most important and changed from this:
+
+<br>f"""
+There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam. In the following email contained within quotation marks: 
+
+"{email}"
+
+The first model is an email body analyzer called aamoshdahal and gave the following results: {b_output_1}
+The second model is an email body analyzer called ealvaradob and gave the following results: {b_output_2}
+The third model is an url analyzer called crabInHoney and gave the following results: {u_output}
+The fourth model is an email body and url analyzer and gave the following results: {b_u_output}
+
+From these models, {dis_scores[0]} of them disagreed based on a 10% confidence disagreement and {dis_scores[1]} of them disagreed based on their pred label.
+
+Using specific reasons from the email being analyzed in this prompt, give me an explination for why this disagreement has occured. 
+
+Keep the response minimal while giving a detailed explination that a high schooler could understand. Minimal header and indentation. The answer should be structured with these categories: "Body analysis differences", "URL analysis differences", and a final "Overall" section. Do not add any '#' or '*' to the headers. Refer to the models by their name.
+
+Finally, on its own line, give your own prediction on how likely the email is a scam, based on the model outputs and the analysis you just gave of their disagreements, by printing a number between 0 and 1 where 0 is not a scam and 1 is a scam. Only print the number, not explination or sentence following it.
+"""
+
+<br>To this:
+
+<br>prompt = f"""
+There has been a disagreement between four language models while reading through this email while trying to detect a phishing scam.
+
+Email: \"{email_body}\"
+
+Model Outputs:
+- aamoshdahal (body analysis): {m_array[0]}
+- ealvardob (body analysis): {m_array[1]}
+- cybersectony (body and url analysis): {m_array[2]}
+- crabInHoney (url analysis): {url_results}
+
+Disagreement scores:
+- confidence disagreement count (10% difference in confidence percent): {d_scores[0]}
+- label disagreement count (number of models who disagreed based on their label): {d_scores[1]}
+
+Using specific reasons from the email and the disagreement score, give an explination for why the disagreement occured. 
+
+Output requirements:
+- No special characters
+- Keep the response concise but still clear and useful
+- Refer to the models by their exact names
+- Do not invent evidence that is not present in the email, model outputs, or disagreement scores
+- Put all explanation before the final line
+
+On the final line, print a scam probability score on the last line.
+
+Probability score requirements:
+- Output exactly 1 line.
+- That line must be a number between 0 and 1.
+- It should reflect the probability this email is a scam (0 is no scam, 1 is a scam).
+- The probability must be based on the the model outputs.
+- It must be the last number that appears anywhere in the response.
+- Do not print any words, labels, punctuation, or extra lines after it.
+"""
+
+<br>On running these new prompts for 10 emails, the results seemed to be worse. But I believe it will open up the system to produce a better set of disagreement analysis. I believe this project would better be set as a way to find where disagreement models are lacking rather than trying to make a better one by combining multipl models. I will show this pivot in my final report and demo. I will define a new function for saving disagreements to a separate file so they can be further analyzed at the end of this project.
