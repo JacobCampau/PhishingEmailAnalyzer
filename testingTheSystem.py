@@ -21,11 +21,12 @@ import ealvaradob
 def main():
     print("Let's Go Phishing Main Page\nLoading Emails...")
     email_list = loadEmails("TestingDataset.csv")
-    filename = "systemTest_1000"
-    emailRange = 1000
+    filename = "systemTest_500_1"
+    email_range = 500
+    start_range = 0
 
     with open(filename, 'a') as file:
-            file.write(f"Test results based off first {emailRange} emails\n\n")
+            file.write(f"Test results based off {email_range} emails starting from email #{start_range + 1}\n\n")
 
     # counts for system
     num_guesses = 0
@@ -34,7 +35,7 @@ def main():
     num_false_positive = 0
 
     # tests
-    for i in range(emailRange):
+    for i in range(start_range, email_range):
         # chosen_email = random.choice(email_list)
         check_results = runCheck(email_list[i])
         num_guesses += 1
@@ -59,10 +60,10 @@ def main():
     percent_fp = num_false_positive / num_guesses
     percent_fn = num_false_negative / num_guesses
 
-    print(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}\n")
+    print(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
 
     with open(filename, 'a') as file:
-            file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}\n")
+            file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
 
 def loadEmails(filename):
     df = pd.read_csv(filename)
