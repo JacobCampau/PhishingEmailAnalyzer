@@ -33,3 +33,6 @@ Added the gpt4 mini model to the system. Found out I need to keep a balance on t
 
 <h3>04/09/2026</h3>
 Separated the main function into multiple functions to help with modularity and reading clarity. Also made a new python script for testing my system compared to the other models. Currently setup to run and give a percent of answers that were correct, the percent of false positives, and the percent of false negatives with respect to the combined system. Now I need to setup a section in the same file to test the other models individually for a comparison. They should be tested on the same emails to ensure the comparison is fair. 
+
+<h3>04/11/2026</h3>
+Ran the first tests for the system. On a sample of 500 emails it performed with 65% correct answers, way under performing. It also had 11% false negatives and 24% false positives when guessing an email was a scam. This is not good. I need to reign in the prompt engineering better. May need to redo the prompt completely to get it done. Once I can get this value up, I will test the other models and make a simple UI. Will likely need to stick to a CLI so I dont need to waste too much time on that and can focus on making the system more accurate.
