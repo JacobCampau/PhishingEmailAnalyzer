@@ -146,14 +146,7 @@ def findDisagreement(confidence_array):
 
             # Label Check
             if not label_disagreement:
-                if "cybersectony" in model_1["model_id"]:
-                    match = model_2["pred"] in model_1["pred"]
-                elif "cybersectony" in model_2["model_id"]:
-                    match = model_1["pred"] in model_2["pred"]
-                else:
-                    match = model_1["pred"] == model_2["pred"]
-
-                if not match:
+                if model_2["pred"] in model_1["pred"] or model_1["pred"] in model_2["pred"]:
                     label_disagreement = True
         
         if confidence_disagreement:

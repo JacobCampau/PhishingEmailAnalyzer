@@ -1,13 +1,9 @@
-from transformers import BertTokenizerFast, BertForSequenceClassification, pipeline
+from transformers import BertTokenizerFast, BertForSequenceClassification
 import torch
-import os
 
 # Get the locally saved model file path
 from pathlib import Path
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "crabInHoney"
-
-# # get the hf token from the environment
-# HF_TOKEN = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 # set model id from Hugging Face
 MODEL_ID = "CrabInHoney/urlbert-tiny-v4-phishing-classifier"
@@ -15,7 +11,6 @@ MODEL_ID = "CrabInHoney/urlbert-tiny-v4-phishing-classifier"
 # set the tokenizer and device from the model id
 tokenizer = BertTokenizerFast.from_pretrained(MODEL_PATH, local_files_only=True)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
-device_num = 0 if torch.cuda.is_available() else -1
 
 # set-up model
 model = BertForSequenceClassification.from_pretrained(MODEL_PATH, local_files_only=True)

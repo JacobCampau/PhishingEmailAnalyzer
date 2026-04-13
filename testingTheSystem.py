@@ -29,12 +29,12 @@ def main():
     print()
     email_list = loadEmails("TestingDataset.csv")
     print()
-    filename = "systemTest_10_1"
-    email_range = 10
+    filename = "systemTest_500_2"
+    email_range = 500
     start_range = 0
 
     with open(filename, 'a') as file:
-            file.write(f"Test results based off {email_range} emails starting from email #{start_range + 1}\n\n")
+        file.write(f"Test results based off {email_range} emails starting from email #{start_range + 1}\n\n")
 
     # counts for system
     num_guesses = 0
@@ -71,7 +71,7 @@ def main():
     print(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
 
     with open(filename, 'a') as file:
-            file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
+        file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
 
 
 if __name__ == "__main__":

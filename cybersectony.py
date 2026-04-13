@@ -1,13 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-import os
 
 # Get the locally saved model file path
 from pathlib import Path
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "cybersectony"
-
-# # get the hf token from the environment
-# HF_TOKEN = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 # set model id from Hugging Face
 MODEL_ID = "cybersectony/phishing-email-detection-distilbert_v2.4.1"
