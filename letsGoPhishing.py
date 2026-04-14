@@ -99,7 +99,7 @@ def runCheck(email):
         # an uncertain score will just say it's a scam to be safe
         scam_point = 1
 
-    return scam_results[0], scam_results[1], scam_point, email["label"], disagreement_scores
+    return scam_results[0], scam_results[1], scam_point, email["label"], disagreement_scores, model_array
 
 def getAnalysis(email, dis_scores, model_outputs):
     response = None
@@ -146,7 +146,7 @@ def findDisagreement(confidence_array):
 
             # Label Check
             if not label_disagreement:
-                if model_2["pred"] in model_1["pred"] or model_1["pred"] in model_2["pred"]:
+                if not (model_2["pred"] in model_1["pred"] or model_1["pred"] in model_2["pred"]):
                     label_disagreement = True
         
         if confidence_disagreement:
