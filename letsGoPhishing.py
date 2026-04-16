@@ -25,7 +25,7 @@ def main():
     print("Testing the models on the following phishing email:")
     print(f"Subject: {chosen_email["subject"]}")
     print("Body:")
-    print(chosen_email["body"])
+    pprint(chosen_email["body"])
 
     check_results = runCheck(chosen_email)
 
@@ -86,6 +86,8 @@ def runCheck(email):
     disagreement_scores = findDisagreement(model_array)
 
     # get gpt response and analysis
+    if disagreement_scores ## NEED TO SEPARATE THE PROMPT GENERATION FROM ANALYSIS!!!
+
     scam_results = getAnalysis(email["body"], disagreement_scores, model_array)
     scam_point = None
 
@@ -223,6 +225,42 @@ def makeAgreementPrompt(email_body, m_array):
     """
     
     return prompt
+
+### GPT Majority Vote
+def majorityVote(num_checks, gpt_prompt, dis):
+    score_total = 0
+    final_score = 0
+    response_analysis = []
+    for _ in range(num_checks):
+        gpt_response = getAnalysis(gpt_prompt)
+        response_analysis.append(gpt_response[0])
+        score_total += gpt_response[0]
+
+    if score_total/num_checks >= 0.5:
+        # at least half agree that the response is a scam, adjust the final score
+        final_score = 1
+    
+    disagree_prompt = f"""
+    A check was ran on an email to determine if it was a scam or not {num_checks} times
+
+    Checks (1 through {num_checks} contained within an array):
+    - \"{gpt_response}\"
+    - At some point in the original testing between 4 model outputs, at least one disagreed and led to these responses
+
+    From these checks, the models agreed the final score should be {final_score} (0 is not a scam, 1 is a scam)
+
+    Give an analysis of where these models most likely disagreed in analyzing the email.
+    
+    Analysis requirements
+    - Keep it simple, no more than 2 paragraphs
+    - No fancy headers
+    - Must support the final score
+    """
+
+    if dis = 1:
+        final_response = gptMini.getAnalysis(disagree_prompt)
+        return final_score, final_response
+    return final_score
 
 ### Run main on start
 if __name__ == "__main__":
