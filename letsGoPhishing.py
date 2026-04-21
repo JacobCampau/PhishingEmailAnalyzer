@@ -29,10 +29,12 @@ def main():
 
     check_results = runCheck(chosen_email)
 
-    print("Analysis:\n")
-    print(check_results[0])
-    print(f"Final determination for chance of scam: {check_results[2]}")
-    print(f"Disagreement scores: {check_results[4]}")
+    if(len(check_results)) > 1:
+        print("\nModels Disagreed.\nDisagreement Analysis:\n")
+        pprint(check_results[1])
+    else:
+        print("\nModels aggreed.")
+    print(f"\nFinal determination for chance of scam: {check_results[0]}")
 
 # Loading the actual email list
 def loadEmails(filename):
@@ -52,6 +54,7 @@ def loadEmails(filename):
 
 ### System Functions
 def runCheck(email):
+    # print("\nGetting Model Outputs...")
     body_outputs_1 = aamoshdahal.predict(email["body"])
     body_outputs_2 = ealvaradob.predict(email["body"])
     url_body_outputs = cybersectony.predict(email["body"])
@@ -86,34 +89,19 @@ def runCheck(email):
     disagreement_scores = findDisagreement(model_array)
 
     # get gpt response and analysis
-    if disagreement_scores ## NEED TO SEPARATE THE PROMPT GENERATION FROM ANALYSIS!!!
-
-    scam_results = getAnalysis(email["body"], disagreement_scores, model_array)
-    scam_point = None
-
-    if scam_results[1] > 0.6:
-        # no scam
-        scam_point = 1
-    elif scam_results[1] < 0.4:
-        # it's a scam
-        scam_point = 0
-    else:
-        # an uncertain score will just say it's a scam to be safe
-        scam_point = 1
-
-    return scam_results[0], scam_results[1], scam_point, email["label"], disagreement_scores, model_array
-
-def getAnalysis(email, dis_scores, model_outputs):
-    response = None
-    prompt = None
-
-    if dis_scores[0] > 0 or dis_scores[1] > 0:
+    disagreement_decision = disagreement_scores[0] > 0 or disagreement_scores[1] > 0
+    if disagreement_decision:
         # there was a disagreement
-        prompt = makeDisagreementPrompt(email, model_outputs, dis_scores)
+        prompt = makeDisagreementPrompt(email, model_array, disagreement_scores)
     else:
         # there was no disagreement
-        prompt = makeAgreementPrompt(email, model_outputs)
+        prompt = makeAgreementPrompt(email, model_array)
     
+    final_vote = majorityVote(3, prompt, disagreement_decision)
+
+    return final_vote, email["label"]
+
+def getAnalysis(prompt):
     # get the gpt response
     response = gptMini.get_analysis(prompt)
 
@@ -126,6 +114,8 @@ def findDisagreement(confidence_array):
     confidence_score = 0
     label_score = 0
     
+    # print("\nGetting Disagreement Scores...")
+
     for i in range(len(confidence_array)):
         model_1 = confidence_array[i]
         label_disagreement = False
@@ -230,11 +220,16 @@ def makeAgreementPrompt(email_body, m_array):
 def majorityVote(num_checks, gpt_prompt, dis):
     score_total = 0
     final_score = 0
+
+    # print("\nBeginning The Voting...")
+    # print(f"This will be based off {num_checks} votes")
+
     response_analysis = []
-    for _ in range(num_checks):
+    for i in range(num_checks):
+        # print(f"Working on vote number: {i+1}")
         gpt_response = getAnalysis(gpt_prompt)
         response_analysis.append(gpt_response[0])
-        score_total += gpt_response[0]
+        score_total += gpt_response[1]
 
     if score_total/num_checks >= 0.5:
         # at least half agree that the response is a scam, adjust the final score
@@ -257,8 +252,9 @@ def majorityVote(num_checks, gpt_prompt, dis):
     - Must support the final score
     """
 
-    if dis = 1:
-        final_response = gptMini.getAnalysis(disagree_prompt)
+    if dis == 1:
+        # print("Disagreements occured amongst the models, analyzing now...")
+        final_response = gptMini.get_analysis(disagree_prompt)
         return final_score, final_response
     return final_score
 

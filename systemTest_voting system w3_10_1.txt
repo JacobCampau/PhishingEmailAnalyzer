@@ -1,0 +1,17 @@
+Test results based off 10 emails starting from email 1
+
+Score: 1. Email Score: 1
+Score: 1. Email Score: 1
+Score: 0. Email Score: 1
+Score: 0. Email Score: 0
+Score: 1. Email Score: 1
+Score: 1. Email Score: 1
+Score: 1. Email Score: 1
+Score: 0. Email Score: 1
+Score: 1. Email Score: 0
+Score: 0. Email Score: 1
+
+=== RESULTS ===
+Percent guessed right: 0.6
+Percent false positive: 0.1
+Percent false negative: 0.3
