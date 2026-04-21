@@ -133,3 +133,6 @@ Changing the prompts to be more concise. Looking back on them, I am still treati
 
 <h3>04/14/2026</h3>
 Fixed an issue with the disagreement code where it mixed labels matching as a sign of disagreement when labels disagreeing should be the correct metric. Also made a lot of demo files to show the stats of the system based off a selection of emails from the dataset. Overall, not pleased with the outcome of this system. I should've stuck to the original plan of a mini transformer model, but this seemed to match my assignment outcomes better since it wouldn't have been creating anything new if I did the transformer model, just another system for finding phishing emails that was even slower than other options.
+
+<h3>04/20/2026</h3>
+Added a voting system. Currently it is just added and not fine tuned. The prompt engineering and logic will likely need to be tuned. But first I want to test it on a wide range of emails to really get an idea on where it stands.
