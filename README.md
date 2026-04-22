@@ -33,27 +33,24 @@ The original plan was to train a mini transformer model using the kaggle dataset
     === System ===
     - Accuracy: 73%
     - False Negative: 20%
-    - False Positive: 
     
     === Model by Aamoshdahal ===
     - Accuracy: 79%
     - False Negative: 21%
-    - False Positive: 
 
     === Model by Ealvardob ===
     - Accuracy: 76%
     - False Negative: 21%
-    - False Positive: 
     
     === Model by CrabInHoney ===
     - Accuracy: 50%
     - False Negative: 31%
-    - False Positive: 
 
     === Model by Cybersectony ===
     - Accuracy: 75%
     - False Negative: 21%
-    - False Positive: 
 
     === Disagreement Results ===
     - Percent of Time Disagreements Arrise: 59%
+
+<br>Where this project stands, there is still much room for improvement. The voting system could be made to be faster and include more votes. The prompt engineering can also have some work. By including the voting system, the accuracy increase from 65.4% to 73%. And before that, improving the disagreement and agreement prompts also improved accuracy. Overall, this project would work better if it ran the models across a wide range of emails and made one analysis of what parts of the emails commonly caused disagreements. This would help inform developers for what new phishing models should look for, improving consumer security for all.</br>
