@@ -29,7 +29,7 @@ def main():
     print()
     email_list = loadEmails("TestingDataset.csv")
     print()
-    email_range = 10
+    email_range = 100
     start_range = 0
     filename = f"systemTest_voting system w3_{email_range}_1.txt"
 

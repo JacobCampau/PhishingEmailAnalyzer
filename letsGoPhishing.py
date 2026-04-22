@@ -54,7 +54,7 @@ def loadEmails(filename):
 
 ### System Functions
 def runCheck(email):
-    # print("\nGetting Model Outputs...")
+    print("\nGetting Model Outputs...")
     body_outputs_1 = aamoshdahal.predict(email["body"])
     body_outputs_2 = ealvaradob.predict(email["body"])
     url_body_outputs = cybersectony.predict(email["body"])
@@ -114,7 +114,7 @@ def findDisagreement(confidence_array):
     confidence_score = 0
     label_score = 0
     
-    # print("\nGetting Disagreement Scores...")
+    print("\nGetting Disagreement Scores...")
 
     for i in range(len(confidence_array)):
         model_1 = confidence_array[i]
@@ -221,12 +221,12 @@ def majorityVote(num_checks, gpt_prompt, dis):
     score_total = 0
     final_score = 0
 
-    # print("\nBeginning The Voting...")
-    # print(f"This will be based off {num_checks} votes")
+    print("\nBeginning The Voting...")
+    print(f"This will be based off {num_checks} votes")
 
     response_analysis = []
     for i in range(num_checks):
-        # print(f"Working on vote number: {i+1}")
+        print(f"Working on vote number: {i+1}")
         gpt_response = getAnalysis(gpt_prompt)
         response_analysis.append(gpt_response[0])
         score_total += gpt_response[1]
@@ -253,7 +253,7 @@ def majorityVote(num_checks, gpt_prompt, dis):
     """
 
     if dis == 1:
-        # print("Disagreements occured amongst the models, analyzing now...")
+        print("Disagreements occured amongst the models, analyzing now...")
         final_response = gptMini.get_analysis(disagree_prompt)
         return final_score, final_response
     return final_score
