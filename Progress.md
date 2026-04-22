@@ -139,3 +139,6 @@ Added a voting system. Currently it is just added and not fine tuned. The prompt
 
 <h3>04/21/2026</h3>
 I was able to test the voting system on 100 emails. Across these emails, accuracy was improved to 73% and false negatives were down to 20%. This is better than even aamoshdahal. This shows that there is a validity in the voting system if it was fine tuned further. Due to the scope of this project, that will not be possible. Combining this with a deeper analysis of a large set of disagreements could make this a better tool in creating better phishing email detection models. 
+
+<h3>04/22/2026</h3>
+Today is the final day I will be coding for this project. My goal is to clean up the code and run last tests on the system as a whole for my report. This project did not go exactly to plan, but it has given me some clear insights into the power of large language models and how to use them in programming projects going forward. The individual models will also be updated so they will not require the locally downloaded files as they have been. It was certainly helpful for testing, but it simply takes up too much space on the repo.

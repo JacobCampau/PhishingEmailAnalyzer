@@ -28,13 +28,14 @@ def main():
     pprint(chosen_email["body"])
 
     check_results = runCheck(chosen_email)
+    votes = check_results[0]
 
-    if(len(check_results)) > 1:
+    if(len(votes)) > 1:
         print("\nModels Disagreed.\nDisagreement Analysis:\n")
-        pprint(check_results[1])
+        pprint(votes[1])
     else:
         print("\nModels aggreed.")
-    print(f"\nFinal determination for chance of scam: {check_results[0]}")
+    print(f"\nFinal determination for chance of scam: {votes[0]}")
 
 # Loading the actual email list
 def loadEmails(filename):
@@ -58,7 +59,31 @@ def runCheck(email):
     body_outputs_1 = aamoshdahal.predict(email["body"])
     body_outputs_2 = ealvaradob.predict(email["body"])
     url_body_outputs = cybersectony.predict(email["body"])
+    
+    urls = getUrls(email)
 
+    # disagreement detection
+    model_array = [body_outputs_1, body_outputs_2, url_body_outputs]
+    if urls and len(urls) > 0:
+        # add the url stuff if there are urls
+        model_array.append(urls)
+        
+    disagreement_scores = findDisagreement(model_array)
+
+    # get gpt response and analysis
+    disagreement_decision = disagreement_scores[0] > 0 or disagreement_scores[1] > 0
+    if disagreement_decision:
+        # there was a disagreement
+        prompt = makeDisagreementPrompt(email, model_array, disagreement_scores)
+    else:
+        # there was no disagreement
+        prompt = makeAgreementPrompt(email, model_array)
+    
+    final_vote = majorityVote(3, prompt, disagreement_decision)
+
+    return final_vote, email["label"]
+
+def getUrls(email):
     extractor = URLExtract()
     urls = extractor.find_urls(email["body"])
 
@@ -79,27 +104,8 @@ def runCheck(email):
             url_outputs = max(phishing_urls, key=lambda x: x["confidence"])
         else:
             url_outputs = max(all_url_outputs, key=lambda x: x["confidence"])
-
-    # disagreement detection
-    model_array = [body_outputs_1, body_outputs_2, url_body_outputs]
-    if urls and len(urls) > 0:
-        # add the url stuff if there are urls
-        model_array.append(url_outputs)
-        
-    disagreement_scores = findDisagreement(model_array)
-
-    # get gpt response and analysis
-    disagreement_decision = disagreement_scores[0] > 0 or disagreement_scores[1] > 0
-    if disagreement_decision:
-        # there was a disagreement
-        prompt = makeDisagreementPrompt(email, model_array, disagreement_scores)
-    else:
-        # there was no disagreement
-        prompt = makeAgreementPrompt(email, model_array)
     
-    final_vote = majorityVote(3, prompt, disagreement_decision)
-
-    return final_vote, email["label"]
+    return url_outputs
 
 def getAnalysis(prompt):
     # get the gpt response

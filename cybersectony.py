@@ -1,20 +1,23 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
+import os
 
 # Get the locally saved model file path
+# no longer used as the models load straight from hugging face. The code here is kept for future reference
 from pathlib import Path
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "cybersectony"
 
 # set model id from Hugging Face
 MODEL_ID = "cybersectony/phishing-email-detection-distilbert_v2.4.1"
+HF_TOKEN = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 # set the tokenizer and device from the model id
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH, local_files_only=True)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token = HF_TOKEN)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu") # attempt to use the GPU
 
 # set-up model
 # MODEL_ID, token = HF_TOKEN
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_PATH, local_files_only=True)
+model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID, token = HF_TOKEN)
 model.to(device)
 model.eval()
 

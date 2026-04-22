@@ -12,7 +12,7 @@ load_dotenv()
 
 # functions needed from the main file in letsGoPhishing
 from letsGoPhishing import loadEmails
-from letsGoPhishing import runCheck
+from letsGoPhishing import getUrls
 
 # Load the models, a print added for visuals
 import gptMini
@@ -21,13 +21,15 @@ import crabInHoney
 import cybersectony
 import ealvaradob
 
+MODEL = "crabInHoney"
+
 def main():
     print()
     email_list = loadEmails("TestingDataset.csv")
     print()
     email_range = 100
     start_range = 0
-    filename = f"systemTest_voting system w3_{email_range}_1.txt"
+    filename = f"modelTest_{MODEL}_{email_range}_1.txt"
 
     with open(filename, 'a') as file:
         file.write(f"Test results based off {email_range} emails starting from email {start_range + 1}\n\n")
@@ -38,9 +40,11 @@ def main():
     num_false_negative = 0
     num_false_positive = 0
 
-    # tests for chosen email
-    for i in range(start_range, email_range + start_range):
-        check_results = runCheck(email_list[i])
+    num_dis = 0
+
+    # tests for model
+    for i in range(start_range, start_range + email_range):
+        check_results = runModel(email_list[i])
         votes = check_results[0]
         num_guesses += 1
         
@@ -73,6 +77,20 @@ def main():
 
     with open(filename, 'a') as file:
         file.write(f"\n=== RESULTS ===\nPercent guessed right: {percent_correct}\nPercent false positive: {percent_fp}\nPercent false negative: {percent_fn}")
+
+def runModel(email):
+    # change this line to change the type of model used, comment out if using crabInHoney
+    # model_outputs = ealvaradob.predict(email["body"])
+
+    # uncomment this when using crabInHoney
+    model_outputs = getUrls(email)
+
+    output = 0
+    if model_outputs:
+        if "legitimate" not in model_outputs["pred"]:
+            output = 1
+
+    return output, email["label"]
 
 if __name__ == "__main__":
     main()
