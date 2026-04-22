@@ -136,3 +136,6 @@ Fixed an issue with the disagreement code where it mixed labels matching as a si
 
 <h3>04/20/2026</h3>
 Added a voting system. Currently it is just added and not fine tuned. The prompt engineering and logic will likely need to be tuned. But first I want to test it on a wide range of emails to really get an idea on where it stands.
+
+<h3>04/21/2026</h3>
+I was able to test the voting system on 100 emails. Across these emails, accuracy was improved to 73% and false negatives were down to 20%. This is better than even aamoshdahal. This shows that there is a validity in the voting system if it was fine tuned further. Due to the scope of this project, that will not be possible. Combining this with a deeper analysis of a large set of disagreements could make this a better tool in creating better phishing email detection models. 
