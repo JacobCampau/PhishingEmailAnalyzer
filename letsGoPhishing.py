@@ -112,9 +112,13 @@ def getAnalysis(prompt):
     response = gptMini.get_analysis(prompt)
 
     # scraping the final conclusion value from the analysis prediction.
-    gpt_prediction = float(response.strip().split()[-1])
+    stripped_response = response.strip().split()[-1]
 
-    return response, gpt_prediction
+    # try converting final value to float
+    try:
+        gpt_prediction = float(stripped_response)
+    except ValueError:
+        gpt_prediction = 0   # default guess it is not a scam
 
 def findDisagreement(confidence_array):
     confidence_score = 0
