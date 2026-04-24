@@ -119,6 +119,8 @@ def getAnalysis(prompt):
         gpt_prediction = float(stripped_response)
     except ValueError:
         gpt_prediction = 0   # default guess it is not a scam
+        
+    return response, gpt_prediction
 
 def findDisagreement(confidence_array):
     confidence_score = 0
