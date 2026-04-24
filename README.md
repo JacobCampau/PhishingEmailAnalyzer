@@ -22,7 +22,7 @@ The goal of this project is to learn how to train a custom small LLM and underst
 <h2>Project Results</h2>
 
 The end system architecture looks as the following
-<img src="https://imgur.com/LGSwmPH" height="80%" width="80%" alt="Flow Chart"/>
+![Flow Chart](Flow-Chart.jpeg)
 
 The original plan was to train a mini transformer model using the kaggle dataset I found. However, this plan changed shortly after starting this project. Due to the short timeframe I determined this may take too long. So I pivoted to develop a chat gpt explination model. 
 
