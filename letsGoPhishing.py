@@ -245,7 +245,7 @@ def majorityVote(num_checks, gpt_prompt, dis):
     A check was ran on an email to determine if it was a scam or not {num_checks} times
 
     Checks (1 through {num_checks} contained within an array):
-    - \"{gpt_response}\"
+    - \"{response_analysis}\"
     - At some point in the original testing between 4 model outputs, at least one disagreed and led to these responses
 
     From these checks, the models agreed the final score should be {final_score} (0 is not a scam, 1 is a scam)
